@@ -407,10 +407,10 @@ export default function ReactionTest() {
         {/* Stats Row */}
         <section className="col-span-full grid grid-cols-4 gap-3 max-[860px]:grid-cols-2">
           {[
-            { label: "Treffer", value: isDone ? `${hits}/${targetCount}` : "--" },
-            { label: "Verpasst", value: isDone ? misses : "--" },
-            { label: "Fehlklicks", value: isDone ? falseAlarms : "--" },
-            { label: "Ø Reaktion", value: isDone ? fmtMs(avgVal) : "-- ms" },
+            { label: "Treffer", value: isRunning ? "--" : `${hits}/${targetCount}` },
+            { label: "Verpasst", value: isRunning ? "--" : misses },
+            { label: "Fehlklicks", value: isRunning ? "--" : falseAlarms },
+            { label: "Ø Reaktion", value: isRunning ? "-- ms" : fmtMs(avgVal) },
           ].map((s) => (
             <article key={s.label} className="border border-gray-200 rounded-lg bg-white/90 shadow-xl p-4">
               <span className="text-sm font-bold text-gray-500">{s.label}</span>
@@ -454,7 +454,9 @@ function SymbolCard({ shape, blank }: { shape: ShapeId | null; blank: boolean })
       className={`grid place-items-center rounded-lg border border-gray-200 shadow-xl ${blank ? "bg-[#f6f8f4] shadow-inner" : "bg-white"}`}
       style={{ width: "68%", aspectRatio: "1" }}
     >
-      {!blank && shape && <ShapeIcon shape={shape} />}
+      {!blank && shape ? <ShapeIcon shape={shape} /> : !blank && (
+        <span className="text-[clamp(5rem,20vw,9rem)] font-black leading-none text-[#111614]">?</span>
+      )}
     </div>
   );
 }
