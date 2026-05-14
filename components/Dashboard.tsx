@@ -143,7 +143,7 @@ export default function Dashboard() {
               <CartesianGrid strokeDasharray="3 3" stroke="#e8eee5" />
               <XAxis dataKey="date" tick={{ fontSize: 11, fontWeight: 700 }} />
               <YAxis tick={{ fontSize: 11, fontWeight: 700 }} unit=" ms" width={60} />
-              <Tooltip formatter={(v: number) => [`${v} ms`, "Reaktionszeit"]} />
+              <Tooltip formatter={(v: number | string | undefined) => [`${v ?? ""} ms`, "Reaktionszeit"]} />
               {phaseLines.map((pl) => (
                 <ReferenceLine key={pl.x} x={pl.x} stroke={pl.color} strokeDasharray="4 2" label={{ value: pl.label, fontSize: 10, fill: pl.color }} />
               ))}
