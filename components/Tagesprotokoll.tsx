@@ -27,6 +27,7 @@ export default function Tagesprotokoll() {
   const [saved, setSaved] = useState(false);
   const [history, setHistory] = useState<LogEntry[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/daily-log")
@@ -55,6 +56,18 @@ export default function Tagesprotokoll() {
       setNotes("");
     }
   }, [date, history]);
+
+  async function handleDelete(id: string) {
+    if (!confirm("Eintrag wirklich löschen?")) return;
+    setDeleting(id);
+    await fetch("/api/daily-log", {
+      method: "DELETE",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    setDeleting(null);
+    setSaved((v) => !v);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -190,32 +203,52 @@ export default function Tagesprotokoll() {
           ) : (
             <div className="grid gap-2.5 max-h-[520px] overflow-y-auto">
               {history.map((e) => (
-                <button
-                  key={e.id}
-                  onClick={() => setDate(e.date)}
-                  className="text-left border border-gray-200 rounded-lg p-3 hover:border-green-300 hover:bg-green-50 transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <strong className="text-sm text-[#14211f]">{e.date}</strong>
-                    {e.subjective_energy != null && (
-                      <span className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-black text-xs ${energyColors[e.subjective_energy]}`}>
-                        {e.subjective_energy}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-500 font-bold flex gap-3 flex-wrap">
-                    {e.screen_time_before_sleep_min != null && <span>📱 {e.screen_time_before_sleep_min} Min.</span>}
-                    {e.sleep_time && <span>🌙 {e.sleep_time}</span>}
-                    {e.training_day && <span>⚽ {e.training_type || "Training"}</span>}
-                    {e.notes && <span className="truncate max-w-[180px]">📝 {e.notes}</span>}
-                  </div>
-                </button>
+                <div key={e.id} className="relative group border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors">
+                  <button
+                    onClick={() => setDate(e.date)}
+                    className="text-left w-full p-3 pr-10"
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <strong className="text-sm text-[#14211f]">{e.date}</strong>
+                      {e.subjective_energy != null && (
+                        <span className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-black text-xs ${energyColors[e.subjective_energy]}`}>
+                          {e.subjective_energy}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500 font-bold flex gap-3 flex-wrap">
+                      {e.screen_time_before_sleep_min != null && <span>📱 {e.screen_time_before_sleep_min} Min.</span>}
+                      {e.sleep_time && <span>🌙 {e.sleep_time}</span>}
+                      {e.training_day && <span>⚽ {e.training_type || "Training"}</span>}
+                      {e.notes && <span className="truncate max-w-[180px]">📝 {e.notes}</span>}
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(e.id)}
+                    disabled={deleting === e.id}
+                    title="Eintrag löschen"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
               ))}
             </div>
           )}
         </section>
       </div>
     </main>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14H6L5 6" />
+      <path d="M10 11v6M14 11v6" />
+      <path d="M9 6V4h6v2" />
+    </svg>
   );
 }
 

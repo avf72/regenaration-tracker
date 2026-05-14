@@ -44,6 +44,7 @@ function Nav() {
           { href: "/", label: "Reaktionstest" },
           { href: "/tagesprotokoll", label: "Tagesprotokoll" },
           { href: "/dashboard", label: "Dashboard" },
+          { href: "/einstellungen", label: "Einstellungen" },
         ].map((l) => (
           <a
             key={l.href}
